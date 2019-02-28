@@ -522,7 +522,7 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
     h <- grid::unit.c(grid::unit(1,"null"), sum(tb$heights) + grid::unit(3, "mm"))
     p <- gridExtra::grid.arrange(p, tb, ncol = 1, heights = h, newpage = TRUE, bottom = grid::textGrob("g:Profiler (biit.cs.ut.ee/gprofiler)", x = 0.95, hjust = 1, gp = grid::gpar(fontsize=10, font=8, col = "cornflowerblue")))
     # convert grob to ggplot object
-    p <- ggplot2::ggplot() + ggplot2::annotation_custom(p)
+    p <- ggplot2::ggplot() + ggplot2::annotation_custom(p) + ggplot2::geom_blank() + ggplot2::theme_void()
   }
 
   if (is.null(filename)){
@@ -536,7 +536,9 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
     }
 
     if (tolower(imgtype) %in% c("png", "pdf", "jpeg", "tiff", "bmp")){
-      ggplot2::ggsave(filename = filename, plot = p)
+      width = max(grDevices::dev.size()[1], 8)
+      height = max(grDevices::dev.size()[2], 6)
+      ggplot2::ggsave(filename = filename, plot = p, width = width, height = height)
       message("The image is saved to ", filename)
       return(p)
     } else {
