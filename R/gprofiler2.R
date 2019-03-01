@@ -6,7 +6,7 @@ gp_globals$version =
     error = function(e) { return("unknown_version") }
   );
 
-# Set SSL vertion to TLSv1_2 with fallback to TLSv1_1
+# Set SSL version to TLSv1_2 with fallback to TLSv1_1
 # CURL_SSLVERSION_SSLv3 is not used due to the SSLv3 vulnerability <https://access.redhat.com/articles/1232123>
 # CURL_SSLVERSION_TLSv1_3 is not widespread enough to have a built-in LibreSSL support yet.
 # (curl's authors may decide to change it at some point, so links to the source are provided.)
@@ -15,7 +15,7 @@ gp_globals$CURL_SSLVERSION_TLSv1_2 <- 6L # <https://github.com/curl/curl/blob/ma
 
 gp_globals$rcurl_opts =
   RCurl::curlOptions(useragent = paste("gprofiler2/", gp_globals$version, sep=""), sslversion = gp_globals$CURL_SSLVERSION_TLSv1_2)
-gp_globals$base_url = "https://biit.cs.ut.ee/gprofiler"
+gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 
 
 #' Gene list functional enrichment.
@@ -57,9 +57,8 @@ gp_globals$base_url = "https://biit.cs.ut.ee/gprofiler"
 #'  The latter conveys info about the intersecting genes between the corresponding query and term.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
-#' \dontrun{
-#'  gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
-#' }
+#' gostres <- gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
+#'
 #' @export
 gost <- function(query,
                       organism = "hsapiens",
@@ -77,13 +76,12 @@ gost <- function(query,
                       sources = NULL
                     ) {
 
-  url = file.path(gp_globals$base_url, "api", "gost", "profile/")
+  url = paste0(file.path(gp_globals$base_url, "api", "gost", "profile"), "/")
 
   # Query
 
   if (is.null(query)) {
-    warning("Missing query")
-    return()
+    stop("Missing query")
   } else if (is.list(query)) {
     # Multiple queries
     qnames = names(query)
@@ -98,13 +96,16 @@ gost <- function(query,
   ## evaluate choices
   correction_method <- match.arg(correction_method)
 
-  if(!is.null(custom_bg)){
+  if (!is.null(custom_bg)){
+    if (!is.vector(custom_bg)){
+      stop("custom_bg must be a vector")
+    }
     message("Detected custom background input, domain scope is set to 'custom'")
     domain_scope <- "custom"
     t <- ifelse(length(custom_bg) == 1, custom_bg <- jsonlite::unbox(custom_bg), custom_bg <- custom_bg)
-  } else {
-    domain_scope <- match.arg(domain_scope)
   }
+
+  domain_scope <- match.arg(domain_scope)
 
   body <- jsonlite::toJSON((
     list(
@@ -141,7 +142,6 @@ gost <- function(query,
   h2 = RCurl::getCurlHandle() # Get info about the request
 
   # Request
-
   r = RCurl::curlPerform(
     url = url,
     postfields = body,
@@ -150,15 +150,15 @@ gost <- function(query,
     verbose = FALSE,
     ssl.verifypeer = FALSE,
     writefunction = h1$update,
-    curl = h2
+    curl = h2,
+    .opts = gp_globals$rcurl_opts
   )
   options(warn = 0)
   rescode = RCurl::getCurlInfo(h2)[["response.code"]]
   txt <- h1$value()
 
   if (rescode != 200) {
-    warning("Bad request, response code ", rescode)
-    return()
+    stop("Bad request, response code ", rescode)
   }
 
   res <- jsonlite::fromJSON(txt)
@@ -166,8 +166,8 @@ gost <- function(query,
   meta = res$meta
 
   if (is.null(dim(df))) {
-    warning("No results to show\n", "Please make sure that the organism is correct or set significant = FALSE")
-    return()
+    message("No results to show\n", "Please make sure that the organism is correct or set significant = FALSE")
+    return(NULL)
   }
 
   # Re-order the data frame columns
@@ -246,10 +246,8 @@ gost <- function(query,
 #' @return The output is either a plotly object (if interactive = TRUE) or a ggplot object (if interactive = FALSE).
 #' @author Liis Kolberg <liis.kolberg@@ut.ee>
 #' @examples
-#' \dontrun{
 #'  gostres <- gost(c("Klf4", "Pax5", "Sox2", "Nanog"), organism = "mmusculus")
 #'  gostplot(gostres)
-#' }
 #' @export
 #' @importFrom plotly %>%
 gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF" = "#dc3912",
@@ -451,17 +449,15 @@ mapViridis <- function(values, domain_min = 0, domain_max = 50, n = 256){
 #' @return The output is a ggplot object.
 #' @author Liis Kolberg <liis.kolberg@@ut.ee>
 #' @examples
-#' \dontrun{
 #'  gostres <- gost(c("Klf4", "Pax5", "Sox2", "Nanog"), organism = "mmusculus")
 #'  p <- gostplot(gostres, interactive = FALSE)
 #'  publish_gostplot(p, highlight_terms = c("GO:0001010", "WP:WP1763"))
-#' }
 #' @export
 publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
   # check that it is a static plot
   if(!("ggplot" %in% class(p))){
     warning("Highlighting terms in a Manhattan plot is available for a ggplot object only.\nPlease set 'interactive = F' in the gostplot() function and try again.")
-    return()
+    return(NULL)
   }
 
   term_id <- logpval <- term_size_scaled <- id <- query <- p_value <- NULL
@@ -474,15 +470,14 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
         highlight_terms <- highlight_terms$term_id
       }
       else{
-        warning("No column named 'term_id'.")
-        return()
+        stop("No column named 'term_id'.")
       }
     }
     df <- p$data
     subdf <- base::subset(df, term_id %in% highlight_terms)
 
     if (nrow(subdf) == 0){
-      warning("None of the term IDs in the 'highlight_terms' was found from the results.")
+      message("None of the term IDs in the 'highlight_terms' was found from the results.")
       return(p)
     }
 
@@ -542,8 +537,7 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
       message("The image is saved to ", filename)
       return(p)
     } else {
-      warning("The given file format is not supported.\nPlease use one of the following extensions: .png, .pdf, .jpeg, .tiff, .bmp")
-      return()
+      stop("The given file format is not supported.\nPlease use one of the following extensions: .png, .pdf, .jpeg, .tiff, .bmp")
     }
   }
 }
@@ -569,9 +563,7 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
 #' web interface output.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
-#' \dontrun{
-#'  gconvert(c("POU5F1", "SOX2", "NANOG"), organism = "hsapiens", target="AFFY_HG_U133_PLUS_2")
-#' }
+#' gconvert(c("POU5F1", "SOX2", "NANOG"), organism = "hsapiens", target="AFFY_HG_U133_PLUS_2")
 #' @export
 gconvert = function(
   query,
@@ -584,8 +576,11 @@ gconvert = function(
   url = file.path(gp_globals$base_url, "api", "convert", "convert")
 
   if (is.null(query)) {
-    warning("Missing query")
-    return()
+    stop("Missing query")
+  }
+
+  if (is.list(query)) {
+    stop("Parameter 'query' must be a vector of values")
   }
 
   body <- jsonlite::toJSON((
@@ -622,22 +617,22 @@ gconvert = function(
     verbose = FALSE,
     ssl.verifypeer = FALSE,
     writefunction = h1$update,
-    curl = h2
+    curl = h2,
+    .opts = gp_globals$rcurl_opts
   )
   options(warn = 0)
   rescode = RCurl::getCurlInfo(h2)[["response.code"]]
   txt <- h1$value()
 
   if (rescode != 200) {
-    warning("Bad request, response code ", rescode)
-    return()
+    stop("Bad request, response code ", rescode)
   }
 
   res <- jsonlite::fromJSON(txt)
   df = res$result
 
   if (is.null(dim(df))) {
-    warning("No results to show\n", "Please make sure that the organism or namespace is correct")
+    message("No results to show\n", "Please make sure that the organism or namespace is correct")
     return(NULL)
   }
 
@@ -683,9 +678,7 @@ gconvert = function(
 #' web interface output.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
-#' \dontrun{
-#'  gorth(c("Klf4","Pax5","Sox2","Nanog"), source_organism="mmusculus", target_organism="hsapiens")
-#' }
+#' gorth(c("Klf4","Pax5","Sox2","Nanog"), source_organism="mmusculus", target_organism="hsapiens")
 #' @export
 
 gorth <- function(
@@ -699,8 +692,11 @@ gorth <- function(
   url = file.path(gp_globals$base_url, "api", "orth", "orth")
 
   if (is.null(query)) {
-    warning("Missing query")
-    return()
+    stop("Missing query")
+  }
+
+  if (is.list(query)) {
+    stop("Parameter 'query' should be a vector of values")
   }
 
   body <- jsonlite::toJSON((
@@ -737,22 +733,22 @@ gorth <- function(
     verbose = FALSE,
     ssl.verifypeer = FALSE,
     writefunction = h1$update,
-    curl = h2
+    curl = h2,
+    .opts = gp_globals$rcurl_opts
   )
   options(warn = 0)
   rescode = RCurl::getCurlInfo(h2)[["response.code"]]
   txt <- h1$value()
 
   if (rescode != 200) {
-    warning("Bad request, response code ", rescode)
-    return()
+    stop("Bad request, response code ", rescode)
   }
 
   res <- jsonlite::fromJSON(txt)
   df = res$result
 
   if (is.null(dim(df))) {
-    warning("No results to show\n", "Please make sure that the organisms or the namespace are correct")
+    message("No results to show\n", "Please make sure that the organisms or the namespace are correct")
     return(NULL)
   }
 
@@ -791,9 +787,7 @@ gorth <- function(
 #' web interface output. Columns 'ensgs' and 'gene_names' can contain list of multiple values.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
-#' \dontrun{
-#'  gsnpense(c("rs11734132", "rs7961894", "rs4305276", "rs17396340", "rs3184504"))
-#' }
+#' gsnpense(c("rs11734132", "rs7961894", "rs4305276", "rs17396340", "rs3184504"))
 #' @export
 
 gsnpense <- function(
@@ -802,13 +796,11 @@ gsnpense <- function(
   url = file.path(gp_globals$base_url, "api", "snpense", "snpense")
 
   if (is.null(query)) {
-    warning("Missing query")
-    return()
+    stop("Missing query")
   }
 
   if ( !any(startsWith(tolower(query), "rs")) ){
-    warning("Query must contain SNP ids with 'rs' prefix.")
-    return()
+    stop("Query must contain SNP ids with 'rs' prefix.")
   }
 
   body <- jsonlite::toJSON((
@@ -842,22 +834,22 @@ gsnpense <- function(
     verbose = FALSE,
     ssl.verifypeer = FALSE,
     writefunction = h1$update,
-    curl = h2
+    curl = h2,
+    .opts = gp_globals$rcurl_opts
   )
   options(warn = 0)
   rescode = RCurl::getCurlInfo(h2)[["response.code"]]
   txt <- h1$value()
 
   if (rescode != 200) {
-    warning("Bad request, response code ", rescode)
-    return()
+    stop("Bad request, response code ", rescode)
   }
 
   res <- jsonlite::fromJSON(txt)
   df = res$result
 
   if (is.null(dim(df))) {
-    warning("No results to show\n", "Please make sure that the input is of correct format")
+    message("No results to show\n", "Please make sure that the input is of correct format")
     return(NULL)
   }
 

@@ -34,9 +34,7 @@ The input is flexible: it accepts a mixed list of IDs and recognises their types
 It can also serve as a service to get all genes belonging to a particular functional category.
 }
 \examples{
-\dontrun{
- gconvert(c("POU5F1", "SOX2", "NANOG"), organism = "hsapiens", target="AFFY_HG_U133_PLUS_2")
-}
+gconvert(c("POU5F1", "SOX2", "NANOG"), organism = "hsapiens", target="AFFY_HG_U133_PLUS_2")
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>, Uku Raudvere <uku.raudvere@ut.ee>

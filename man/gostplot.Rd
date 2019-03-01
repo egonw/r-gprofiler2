@@ -26,10 +26,8 @@ This function creates a Manhattan plot out of the results from gprofiler2::gost(
 The plot is very similar to the one shown in the g:GOSt web tool.
 }
 \examples{
-\dontrun{
  gostres <- gost(c("Klf4", "Pax5", "Sox2", "Nanog"), organism = "mmusculus")
  gostplot(gostres)
-}
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>

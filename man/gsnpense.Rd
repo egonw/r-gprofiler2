@@ -21,9 +21,7 @@ Interface to the g:Profiler tool g:SNPense that maps SNP rs identifiers to chrom
 Available only for human SNPs.
 }
 \examples{
-\dontrun{
- gsnpense(c("rs11734132", "rs7961894", "rs4305276", "rs17396340", "rs3184504"))
-}
+gsnpense(c("rs11734132", "rs7961894", "rs4305276", "rs17396340", "rs3184504"))
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>, Uku Raudvere <uku.raudvere@ut.ee>

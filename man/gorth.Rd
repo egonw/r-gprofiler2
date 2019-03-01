@@ -34,9 +34,7 @@ web interface output.
 Interface to the g:Profiler tool g:Orth that, given a target organism, retrieves the genes of the target organism that are similar in sequence to the source organism genes in the input.
 }
 \examples{
-\dontrun{
- gorth(c("Klf4","Pax5","Sox2","Nanog"), source_organism="mmusculus", target_organism="hsapiens")
-}
+gorth(c("Klf4","Pax5","Sox2","Nanog"), source_organism="mmusculus", target_organism="hsapiens")
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>, Uku Raudvere <uku.raudvere@ut.ee>

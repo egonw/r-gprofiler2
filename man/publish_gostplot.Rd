@@ -22,11 +22,9 @@ The resulting plot is saved to a publication ready image if 'filename' is specif
 The plot is very similar to the one shown in the g:GOSt web tool after clicking on circles.
 }
 \examples{
-\dontrun{
  gostres <- gost(c("Klf4", "Pax5", "Sox2", "Nanog"), organism = "mmusculus")
  p <- gostplot(gostres, interactive = FALSE)
  publish_gostplot(p, highlight_terms = c("GO:0001010", "WP:WP1763"))
-}
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>

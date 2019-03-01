@@ -66,9 +66,8 @@ If 'multi_query' is selected, the result is a data frame for comparing multiple 
 just as in the web tool.
 }
 \examples{
-\dontrun{
- gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
-}
+gostres <- gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
+
 }
 \author{
 Liis Kolberg <liis.kolberg@ut.ee>, Uku Raudvere <uku.raudvere@ut.ee>
