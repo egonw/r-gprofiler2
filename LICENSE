@@ -290,7 +290,7 @@ to attach them to the start of each source file to most effectively
 convey the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    r-gprofiler2
+    r-gprofiler2 - an R package providing interface to the g:Profiler web tool.
     Copyright (C) 2019  University of Tartu, Institute of Computer Science
 
     This program is free software; you can redistribute it and/or modify
