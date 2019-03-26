@@ -7,6 +7,6 @@
 
 An R interface corresponding to the 2019 update of g:Profiler web tool.
 
-## g:GOSt
+### g:GOSt Manhattan plot example generated in R
 
-![manhattan_example](skinpancreas.png)
+<img src="skinpancreas.png" alt="manhattan" width="800"/>
