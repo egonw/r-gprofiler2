@@ -322,6 +322,7 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
 
   # If multiquery
   if("p_values" %in% colnames(df)){
+    p_values <- query <- significant <- NULL
     # spread the data frame to correct form
     df$query <- list(names(meta$query_metadata$queries))
     df <- df %>% tidyr::unnest(p_values, query, significant) %>% dplyr::rename(p_value = p_values)
