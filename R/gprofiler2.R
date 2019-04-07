@@ -324,7 +324,7 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
   if("p_values" %in% colnames(df)){
     # spread the data frame to correct form
     df$query <- list(names(meta$query_metadata$queries))
-    df <- df %>% tidyr::unnest("p_values", "query", "significant") %>% dplyr::rename("p_value" = "p_values")
+    df <- df %>% tidyr::unnest(p_values, query, significant) %>% dplyr::rename(p_value = p_values)
   }
 
   # Set sizescale of circles
