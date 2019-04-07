@@ -5,4 +5,8 @@
 
 # r-gprofiler2
 
-An R interface corresponding to the 2019 update of g:Profiler web tool. 
+An R interface corresponding to the 2019 update of g:Profiler web tool.
+
+### g:GOSt Manhattan plot example generated in R
+
+<img src="skinpancreas.png" alt="manhattan" width="800"/>
