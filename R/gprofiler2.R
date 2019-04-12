@@ -131,7 +131,6 @@ gost <- function(query,
   ),
   auto_unbox = FALSE,
   null = "null")
-
   # Headers
 
   headers <-
@@ -141,7 +140,7 @@ gost <- function(query,
 
   oldw <- getOption("warn")
   options(warn = -1)
-  h1 = RCurl::basicTextGatherer()
+  h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
   h2 = RCurl::getCurlHandle() # Get info about the request
 
   # Request
