@@ -92,6 +92,10 @@ gost <- function(query,
       qnames = paste("query", seq(1, length(query)), sep = "_")
       names(query) = qnames
     }
+    query = lapply(query, function(x) x[!is.na(x)])
+  }
+  else{
+    query = query[!is.na(query)]
   }
 
   # Parameters
@@ -281,7 +285,7 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
              "HP" = "#990099")
   }
 
-  if (!("result" %in% names(gostres))) stop("Name 'result' found from the input")
+  if (!("result" %in% names(gostres))) stop("Name 'result' not found from the input")
   if (!("meta" %in% names(gostres))) stop("Name 'meta' not found from the input")
 
   source_order <- logpval <- term_id <- opacity <- NULL
