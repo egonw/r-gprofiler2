@@ -21,11 +21,11 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #' Gene list functional enrichment.
 #'
 #' Interface to the g:Profiler tool g:GOSt for functional enrichments analysis of gene lists.
-#' In case the input 'query' is a list, results for multiple queries will be returned in the same data frame with column 'query' indicating the corresponding query name.
+#' In case the input 'query' is a list of gene vectors, results for multiple queries will be returned in the same data frame with column 'query' indicating the corresponding query name.
 #' If 'multi_query' is selected, the result is a data frame for comparing multiple input lists,
 #' just as in the web tool.
 #'
-#' @param query vector that can consist of mixed types of gene IDs (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or term IDs; or a (named) list of such vectors.
+#' @param query vector, or a (named) list of vectors for multiple queries, that can consist of mixed types of gene IDs (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or term IDs.
 #' @param organism organism name. Organism names are constructed by concatenating the first letter of the name and the
 #' family name. Example: human - 'hsapiens', mouse - 'mmusculus'.
 #' @param ordered_query in case input gene lists are ranked this option may be
@@ -103,6 +103,14 @@ gost <- function(query,
   ## evaluate choices
   correction_method <- match.arg(correction_method)
 
+  if (startsWith(organism, "gp__")){
+    message("Detected custom GMT source request")
+    if (!is.null(sources)){
+      message("Sources selection is not available in custom GMT requests. All sources in the GMT upload are used.")
+      sources <- NULL
+    }
+
+  }
   if (!is.null(custom_bg)){
     if (!is.vector(custom_bg)){
       stop("custom_bg must be a vector")
@@ -300,7 +308,7 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
 
   if (!(all(essential_names %in% colnames(df)))) stop(paste("The following columns are missing from the result:", paste0(setdiff(essential_names, colnames(df)), collapse = ", ")))
 
-  if(!any(grepl("p_value", colnames(df)))) stop("Column 'p_value(s)' is missing from the result")
+  if (!any(grepl("p_value", colnames(df)))) stop("Column 'p_value(s)' is missing from the result")
 
   # nr_of_terms for every source
   widthscale <- unlist(lapply(meta$query_metadata$sources, function(x) meta$result_metadata[[x]][["number_of_terms"]]))
@@ -320,10 +328,17 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
   names(starts) <- names(widthscale)
 
   # Make sure that all the sources have colors
+
+  if (is.null(names(pal))){
+    names(pal) = meta$query_metadata$sources[1:length(pal)]
+  }
+
   sourcediff = setdiff(meta$query_metadata$sources, names(pal))
+  colors = grDevices::colors(distinct = TRUE)[grep('gr(a|e)y|white|snow|khaki|lightyellow', grDevices::colors(distinct = TRUE), invert = TRUE)]
 
   if (length(sourcediff) > 0){
-    pal[sourcediff] <- sample(grDevices::colors(distinct = TRUE), length(sourcediff), replace = TRUE)
+    use_cols = sample(colors, length(sourcediff), replace = FALSE)
+    pal[sourcediff] <- use_cols
   }
 
   # If multiquery
@@ -947,8 +962,8 @@ get_base_url = function() {
 
 #' Set the base URL.
 #'
-#' Function to change the g:Profiler base URL. Useful for overriding the default URL (https://biit.cs.ut.ee/gprofiler)
-#' with the beta (https://biit.cs.ut.ee/gprofiler_beta) or an archived version (available starting from the version e94_eg41_p11).
+#' Function to change the g:Profiler base URL. Useful for overriding the default URL (http://biit.cs.ut.ee/gprofiler)
+#' with the beta (http://biit.cs.ut.ee/gprofiler_beta) or an archived version (available starting from the version e94_eg41_p11, e.g. http://biit.cs.ut.ee/gprofiler_archive3/e94_eg41_p11).
 #'
 #' @param url the base URL.
 #' @export
@@ -956,13 +971,10 @@ get_base_url = function() {
 set_base_url = function(url) {
   url = as.character(url)
   schema = substr(url, 1, 4)
-  suffix = substr(url, nchar(url), nchar(url))
 
   if (schema != "http")
     stop("The URL must be absolute and use the HTTP(S) schema")
-  if (suffix != "/")
-    url = paste(url, "/", sep="")
 
-  assign("base_url", url, envir=gp_globals)
+  assign("base_url", url, envir = gp_globals)
 }
 

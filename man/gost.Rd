@@ -13,7 +13,7 @@ gost(query, organism = "hsapiens", ordered_query = FALSE,
   numeric_ns = "", sources = NULL)
 }
 \arguments{
-\item{query}{vector that can consist of mixed types of gene IDs (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or term IDs; or a (named) list of such vectors.}
+\item{query}{vector, or a (named) list of vectors for multiple queries, that can consist of mixed types of gene IDs (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or term IDs.}
 
 \item{organism}{organism name. Organism names are constructed by concatenating the first letter of the name and the
 family name. Example: human - 'hsapiens', mouse - 'mmusculus'.}
@@ -61,7 +61,7 @@ A named list where 'result' contains data.frame with the enrichment analysis res
 }
 \description{
 Interface to the g:Profiler tool g:GOSt for functional enrichments analysis of gene lists.
-In case the input 'query' is a list, results for multiple queries will be returned in the same data frame with column 'query' indicating the corresponding query name.
+In case the input 'query' is a list of gene vectors, results for multiple queries will be returned in the same data frame with column 'query' indicating the corresponding query name.
 If 'multi_query' is selected, the result is a data frame for comparing multiple input lists,
 just as in the web tool.
 }
