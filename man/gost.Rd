@@ -22,7 +22,8 @@ family name. Example: human - 'hsapiens', mouse - 'mmusculus'.}
 used to get GSEA style p-values.}
 
 \item{multi_query}{in case of multiple gene lists, returns comparison table of these lists.
-If enabled, the result data frame has columns named 'p_values', 'query_sizes', 'intersection_sizes' with vectors showing values in the order of input queries.}
+If enabled, the result data frame has columns named 'p_values', 'query_sizes', 'intersection_sizes' with vectors showing values in the order of input queries.
+To get the results in a long format set 'multi_query' to FALSE and just input query list of multiple gene vectors.}
 
 \item{significant}{whether all or only statistically significant results should
 be returned.}
@@ -33,7 +34,8 @@ be returned.}
 
 \item{evcodes}{include evidence codes to the results. Note
 that this can decrease performance and make the query slower.
-In addition, a column 'intersection' is created that contains the gene id-s that intersect between the query and term.}
+In addition, a column 'intersection' is created that contains the gene id-s that intersect between the query and term.
+This parameter does not work if 'multi_query' is set to TRUE.}
 
 \item{user_threshold}{custom p-value threshold, results with a larger p-value are
 excluded.}
