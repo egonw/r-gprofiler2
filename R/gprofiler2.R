@@ -660,21 +660,22 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
     # spread the data frame to correct form
     subdf <- tidyr::unnest(data = subdf, p_values, query)
     subdf <- dplyr::rename(subdf, p_value = p_values)
-    showdf <- subdf[,stats::na.omit(match(colnames, names(subdf)))]
-
+    subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
+    showdf <- subdf[,stats::na.omit(match(c(colnames, "query"), names(subdf)))]
     showdf <- tidyr::spread(showdf, query, p_value)
     idx <- which(!is.na(match(names(showdf), unique(subdf$query))))
   } else {
     if ("query" %in% names(subdf) & length(unique(subdf$query)) > 1){
-      showdf <- subdf[,stats::na.omit(match(colnames, names(subdf)))]
+      subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
+      showdf <- subdf[,stats::na.omit(match(c(colnames, "query"), names(subdf)))]
       showdf <- tidyr::spread(showdf, query, p_value)
       idx <- which(!is.na(match(names(showdf), unique(subdf$query))))
     } else {
+      subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
       showdf <- subdf[,stats::na.omit(match(colnames, names(subdf)))]
       idx <- which(!is.na(match(names(showdf), "p_value")))
     }
   }
-  showdf$p_value <- formatC(showdf$p_value, format = "e", digits = 3)
 
   # Prepare table
   colours <- matrix("white", nrow(showdf), ncol(showdf))
