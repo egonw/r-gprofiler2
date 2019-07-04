@@ -1,7 +1,7 @@
 Package: gprofiler2
 Type: Package
 Title: Interface to the 'g:Profiler' Toolset
-Version: 0.1.4
+Version: 0.1.5
 Author: Liis Kolberg <liis.kolberg@ut.ee>, Uku Raudvere <uku.raudvere@ut.ee>
 Maintainer: Liis Kolberg <liis.kolberg@ut.ee>
 Description: A toolset for functional enrichment analysis and visualization, gene/protein/SNP identifier conversion and mapping orthologous genes across species via 'g:Profiler' (<https://biit.cs.ut.ee/gprofiler>). 
