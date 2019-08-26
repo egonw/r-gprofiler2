@@ -1,0 +1,6 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+LICENSE
+^.*\.png
+README.md
+hybrid_filtering
