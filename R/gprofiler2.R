@@ -481,6 +481,8 @@ mapViridis <- function(values, domain_min = 0, domain_max = 50, n = 256){
 #' @param p ggplot object from gostplot(gostres, interactive = FALSE) function
 #' @param highlight_terms vector of selected term IDs from the analysis or a (subset) data.frame that has a column called 'term_id'. No annotation is added if set to NULL.
 #' @param filename file name to create on disk and save the annotated plot. Filename extension should be from c("png", "pdf", "jpeg", "tiff", "bmp").
+#' @param width plot width in inches. If not supplied, the size of current graphics device is used.
+#' @param height plot height in inches. If not supplied, the size of current graphics device is used.
 #' @return The output is a ggplot object.
 #' @author Liis Kolberg <liis.kolberg@@ut.ee>
 #' @examples
@@ -488,7 +490,7 @@ mapViridis <- function(values, domain_min = 0, domain_max = 50, n = 256){
 #'  p <- gostplot(gostres, interactive = FALSE)
 #'  publish_gostplot(p, highlight_terms = c("GO:0001010", "WP:WP1763"))
 #' @export
-publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
+publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL, width = NA, height = NA){
   # check that it is a static plot
   if(!("ggplot" %in% class(p))){
     warning("Highlighting terms in a Manhattan plot is available for a ggplot object only.\nPlease set 'interactive = F' in the gostplot() function and try again.")
@@ -550,11 +552,14 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
                                     rowhead=list(fg_params=list(col="black", fontface="bold")))
     tb <- gridExtra::tableGrob(showdf, theme = th, rows = NULL)
     h <- grid::unit.c(grid::unit(1, "null"), sum(tb$heights) + grid::unit(3, "mm"))
-    w <- grid::unit.c(sum(tb$widths))
+    #w <- grid::unit.c(sum(tb$widths))
+    w <- grid::unit.c(grid::unit(1, "null"))
     tg <- gridExtra::grid.arrange(p, tb, ncol = 1, heights = h, widths = w, newpage = TRUE, bottom = grid::textGrob("g:Profiler (biit.cs.ut.ee/gprofiler)", x = 0.95, hjust = 1, gp = grid::gpar(fontsize=10, font=8, col = "cornflowerblue")))
     # convert grob to ggplot object
     p <- ggplot2::ggplot() + ggplot2::annotation_custom(tg) + ggplot2::geom_blank() + ggplot2::theme_void()
-  }
+    #width = grid::convertWidth(sum(tg$widths), "in", TRUE) + 0.1
+    #height = grid::convertHeight(sum(tg$heights), "in", TRUE) + 10.2
+   }
 
   if (is.null(filename)){
     return(p)
@@ -567,12 +572,12 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL){
     }
 
     if (tolower(imgtype) %in% c("png", "pdf", "jpeg", "tiff", "bmp")){
-      #width = max(grDevices::dev.size()[1], 8)
-      #height = max(grDevices::dev.size()[2], 6)
-      width = grid::convertWidth(sum(tg$widths), "in", TRUE) + 0.1
-      height = grid::convertHeight(sum(tg$heights), "in", TRUE) + 10.2
-      print(height)
-      print(width)
+      if (is.na(width)){
+        width = max(grDevices::dev.size()[1], 8)
+      }
+      if (is.na(height)){
+        height = max(grDevices::dev.size()[2], 6)
+      }
       ggplot2::ggsave(filename = filename, plot = p, width = width, height = height, limitsize = F)
       message("The image is saved to ", filename)
       return(p)
