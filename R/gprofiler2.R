@@ -20,7 +20,7 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 
 #' Gene list functional enrichment.
 #'
-#' Interface to the g:Profiler tool g:GOSt for functional enrichments analysis of gene lists.
+#' Interface to the g:Profiler tool g:GOSt (\url{https://biit.cs.ut.ee/gprofiler/gost}) for functional enrichments analysis of gene lists.
 #' In case the input 'query' is a list of gene vectors, results for multiple queries will be returned in the same data frame with column 'query' indicating the corresponding query name.
 #' If 'multi_query' is selected, the result is a data frame for comparing multiple input lists,
 #' just as in the web tool.
@@ -57,6 +57,8 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #'  When requesting a 'multi_query', either TRUE or FALSE, the columns of the resulting data frame differ.
 #'  If 'evcodes' is set, the return value includes columns 'evidence_codes' and 'intersection'.
 #'  The latter conveys info about the intersecting genes between the corresponding query and term.
+#'
+#'  The result fields are further described in \url{https://biit.cs.ut.ee/gprofiler_beta/page/apis#gost_query_results}
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
 #' gostres <- gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
@@ -845,9 +847,61 @@ upload_GMT_file <- function(gmtfile){
   return(custom_id)
 }
 
+
+#' Generate a random gene list.
+#'
+#' This function returns a vector of randomly selected genes from the selected organism.
+#'
+#' @param organism organism name. Organism names are constructed by concatenating the first letter of the name and the
+#' family name. Example: human - 'hsapiens', mouse - 'mmusculus'.
+#' @return a character vector containing randomly selected gene IDs from the selected organism.
+#' @author Liis Kolberg <liis.kolberg@@ut.ee>
+#' @examples
+#' random_genes <- random_query()
+#' @export
+random_query <- function(organism = "hsapiens"){
+  url = paste0(file.path(gp_globals$base_url, "api", "gost", "random_query"), "/")
+  body <- jsonlite::toJSON((
+    list(organism = jsonlite::unbox(organism))),
+    auto_unbox = FALSE,
+    null = "null")
+  # Headers
+
+  headers <- list("Accept" = "application/json",
+                  "Content-Type" = "application/json",
+                  "charset" = "UTF-8")
+
+  oldw <- getOption("warn")
+  options(warn = -1)
+  h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
+  h2 = RCurl::getCurlHandle() # Get info about the request
+
+  # Request
+  r = RCurl::curlPerform(
+    url = url,
+    postfields = body,
+    httpheader = headers,
+    customrequest = 'POST',
+    verbose = FALSE,
+    ssl.verifypeer = FALSE,
+    writefunction = h1$update,
+    curl = h2,
+    .opts = gp_globals$rcurl_opts
+  )
+  options(warn = 0)
+  rescode = RCurl::getCurlInfo(h2)[["response.code"]]
+  txt <- h1$value()
+
+  if (rescode != 200) {
+    stop("Bad request, response code ", rescode)
+  }
+  res <- jsonlite::fromJSON(txt)
+  return(res)
+}
+
 #' Gene ID conversion.
 #'
-#' Interface to the g:Profiler tool g:Convert that uses the information in Ensembl databases to handle hundreds of types of identifiers for genes, proteins, transcripts, microarray probesets, etc, for many species,
+#' Interface to the g:Profiler tool g:Convert (\url{https://biit.cs.ut.ee/gprofiler/convert}) that uses the information in Ensembl databases to handle hundreds of types of identifiers for genes, proteins, transcripts, microarray probesets, etc, for many species,
 #' experimental platforms and biological databases.
 #' The input is flexible: it accepts a mixed list of IDs and recognises their types automatically.
 #' It can also serve as a service to get all genes belonging to a particular functional category.
@@ -963,7 +1017,7 @@ gconvert = function(
 
 #' Orthology search.
 #'
-#' Interface to the g:Profiler tool g:Orth that, given a target organism, retrieves the genes of the target organism that are similar in sequence to the source organism genes in the input.
+#' Interface to the g:Profiler tool g:Orth (\url{https://biit.cs.ut.ee/gprofiler/orth}) that, given a target organism, retrieves the genes of the target organism that are similar in sequence to the source organism genes in the input.
 #'
 #' @param query vector of gene IDs to be translated.
 #' @param source_organism name of the source organism. Organism names are constructed by concatenating
@@ -1079,7 +1133,7 @@ gorth <- function(
 
 #' Convert SNP rs numbers to genes.
 #'
-#' Interface to the g:Profiler tool g:SNPense that maps SNP rs identifiers to chromosome positions, genes and variant effects.
+#' Interface to the g:Profiler tool g:SNPense (\url{https://biit.cs.ut.ee/gprofiler/snpense}) that maps SNP rs identifiers to chromosome positions, genes and variant effects.
 #' Available only for human SNPs.
 #'
 #' @param query vector of SNP IDs to be translated (should start with prefix 'rs').
