@@ -128,6 +128,10 @@ gost <- function(query,
       domain_scope <- "custom"
     }
     t <- ifelse(length(custom_bg) == 1, custom_bg <- jsonlite::unbox(custom_bg), custom_bg <- custom_bg)
+  }else{
+    if (domain_scope %in% c("custom_annotated", "custom")){
+      stop("Domain scope is set to custom, but no background genes detected from the input.")
+    }
   }
 
   domain_scope <- match.arg(domain_scope)
