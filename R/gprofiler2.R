@@ -44,8 +44,8 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #' @param user_threshold custom p-value threshold, results with a larger p-value are
 #'  excluded.
 #' @param correction_method the algorithm used for multiple testing correction, one of "gSCS" (synonyms: "analytical", "g_SCS"), "fdr" (synonyms: "false_discovery_rate"), "bonferroni".
-#' @param domain_scope how to define statistical domain, one of "annotated", "known" or "custom".
-#' @param custom_bg vector of gene names to use as a statistical background. If given, the domain_scope is set to 'custom'.
+#' @param domain_scope how to define statistical domain, one of "annotated", "known", "custom" or "custom_annotated".
+#' @param custom_bg vector of gene names to use as a statistical background. If given, the domain_scope is by default set to "custom", if domain_scope is set to "custom_annotated", then this is used instead.
 #' @param numeric_ns namespace to use for fully numeric IDs.
 #' @param sources a vector of data sources to use. Currently, these include
 #'  GO (GO:BP, GO:MF, GO:CC to select a particular GO branch), KEGG, REAC, TF,
@@ -74,7 +74,7 @@ gost <- function(query,
                       evcodes = FALSE,
                       user_threshold = 0.05,
                       correction_method = c("g_SCS", "bonferroni", "fdr", "false_discovery_rate", "gSCS", "analytical"),
-                      domain_scope = c("annotated", "known", "custom"),
+                      domain_scope = c("annotated", "known", "custom", "custom_annotated"),
                       custom_bg = NULL,
                       numeric_ns  = "",
                       sources = NULL
@@ -123,8 +123,10 @@ gost <- function(query,
     if (!is.vector(custom_bg)){
       stop("custom_bg must be a vector")
     }
-    message("Detected custom background input, domain scope is set to 'custom'")
-    domain_scope <- "custom"
+    if (!domain_scope %in% c("custom_annotated", "custom")){
+      message("Detected custom background input, domain scope is set to 'custom'")
+      domain_scope <- "custom"
+    }
     t <- ifelse(length(custom_bg) == 1, custom_bg <- jsonlite::unbox(custom_bg), custom_bg <- custom_bg)
   }
 
