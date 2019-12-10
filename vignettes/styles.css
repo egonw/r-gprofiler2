@@ -1,0 +1,10 @@
+body {
+  max-width: 1200px;
+}
+h2 {
+  border-bottom: none;
+
+}
+#header {
+  background-color: red important!;
+}
