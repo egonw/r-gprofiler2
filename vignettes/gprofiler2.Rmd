@@ -40,7 +40,7 @@ knitr::opts_chunk$set(
 [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) provides an R interface to the widely used web toolset g:Profiler ([https://biit.cs.ut.ee/gprofiler](https://biit.cs.ut.ee/gprofiler)). 
 
 The toolset performs functional enrichment analysis and visualization of gene lists, converts gene/protein/SNP identifiers to numerous namespaces, and maps orthologous genes across species. 
-[g:Profiler](https://biit.cs.ut.ee/gprofiler) relies on [Ensembl databases](https://www.ensembl.org/index.html) as primary data source and follows their release cycle for updating data sources.  
+[g:Profiler](https://biit.cs.ut.ee/gprofiler) relies on [Ensembl databases](https://www.ensembl.org/index.html) as the primary data source and follows their release cycle for updates.
 
 The main tools in [g:Profiler](https://biit.cs.ut.ee/gprofiler) are:
 
@@ -48,7 +48,7 @@ The main tools in [g:Profiler](https://biit.cs.ut.ee/gprofiler) are:
 * [g:Convert](https://biit.cs.ut.ee/gprofiler/convert) - gene/protein/transcript identifier conversion across various namespaces 
 * [g:Orth](https://biit.cs.ut.ee/gprofiler/orth) - orthology search across species 
 
-The input for any of the abovementioned tools can consist of mixed types of gene identifiers, SNP rs-IDs, chromosomal intervals or term IDs. The ENSG genes from chromosomal regions are retrieved automatically. The genes doesn't need to fit the region fully. The format for chromosome regions is chr:region\_start:region\_end, e.g. *X:1:2000000*. In case of term IDs like [GO:0007507](http://www.informatics.jax.org/vocab/gene_ontology/GO:0007507) (heart development), g:Profiler uses all the genes annotated to that term as an input (in this case about six hundred human genes associated to heart development). Fully numeric identifiers need to be prefixed with corresponding namespace. g:Profiler will automatically prefix all the detected numeric IDs using the prefix determined by the selected numeric namespace parameter.  
+The input for any of the tools can consist of mixed types of gene identifiers, SNP rs-IDs, chromosomal intervals or term IDs. The gene IDs from chromosomal regions are retrieved automatically. The gene doesn't need to fit the region fully. The format for chromosome regions is chr:region\_start:region\_end, e.g. *X:1:2000000*. In case of term IDs like [GO:0007507](http://www.informatics.jax.org/vocab/gene_ontology/GO:0007507) (heart development), g:Profiler uses all the genes annotated to that term as an input (in this case about six hundred human genes associated to heart development). Fully numeric identifiers need to be prefixed with the corresponding namespace. g:Profiler will automatically prefix all the detected numeric IDs using the prefix determined by the selected numeric namespace parameter.
 
 * [g:SNPense](https://biit.cs.ut.ee/gprofiler/snpense) - mapping SNP rs-identifiers to chromosome positions, protein coding genes and variant effects 
 
@@ -59,7 +59,7 @@ Corresponding functions in the [gprofiler2](https://cran.r-project.org/web/packa
 * [`gorth`][Mapping homologous genes across related organisms with `gorth`]
 * [`gsnpense`][SNP identifier conversion to gene name with `gsnpense`]
 
-[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) uses the [publicly available APIs](https://biit.cs.ut.ee/gprofiler/page/apis) of g:Profiler web tool which ensures that the results from all of the interfaces are consistent. 
+[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) uses the [publicly available APIs](https://biit.cs.ut.ee/gprofiler/page/apis) of the g:Profiler web tool which ensures that the results from all of the interfaces are consistent.
 
 The package corresponds to the 2019 update of [g:Profiler](https://biit.cs.ut.ee/gprofiler) and provides access for versions *e94_eg41_p11* and higher. The older versions are available from the previous R package [gProfileR](https://cran.r-project.org/web/packages/gProfileR/index.html).
 
@@ -84,7 +84,7 @@ library(gprofiler2)
 
 A standard input of the `gost` function is a (named) list of gene identifiers. The list can consist of mixed types of identifiers (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or functional term IDs. 
 
-The parameter `organism` enables to define the corresponding source organism for the gene list. The organism names are constructed by concatenating the first letter of the name and the family name, e.g human - *hsapiens*. If some of the input gene IDs are fully numeric, the `numeric_ns` defines the corresponding namespace. If some of the input gene identifiers are fully numeric, the parameter `numeric_ns` enables to define the corresponding namespace. See section [Supported organisms and identifier namespaces] for links to supported organisms and namespaces.
+The parameter `organism` enables to define the corresponding source organism for the gene list. The organism names are usually constructed by concatenating the first letter of the name and the family name, e.g human - *hsapiens*. If some of the input gene identifiers are fully numeric, the parameter `numeric_ns` enables to define the corresponding namespace. See section [Supported organisms and identifier namespaces] for links to supported organisms and namespaces.
 
 If the input genes are decreasingly ordered based on some biological importance, then `ordered_query = TRUE` will take this into account. For instance, the genes can be ordered according to differential expression or absolute expression values. In this case, incremental enrichment testing is performed with increasingly larger numbers of genes starting from the top of the list. Note that with this parameter, the query size might be different for every functional term. 
 
@@ -98,7 +98,7 @@ By default, the `user_threshold = 0.05` which defines a custom p-value threshold
 
 In order to reduce the amount of false positives, a [multiple testing correction method](https://biit.cs.ut.ee/gprofiler/page/docs#significance_threhshold) is applied to the enrichment p-values. By default, our tailor-made algorithm g\:SCS is used (`correction_method = "gSCS"` with synonyms `g_SCS` and `analytical`), but there are also options to apply the Bonferroni correction (`correction_method = "bonferroni"`) or FDR (`correction_method = "fdr"`). The adjusted p-values are reported in the results. 
 
-The parameter `domain_scope` defines how the [statistical domain size](https://biit.cs.ut.ee/gprofiler/page/docs#statistical_domain_scope) is calculated. This is one of the parameters in the hypergeometric probability function. If `domain_scope = "annotated"` then only the genes with at least one annotation are considered to be part of the full domain. In case if `domain_scope = "known"` then all the genes of the given organism are considered to be part of the domain. 
+The parameter `domain_scope` defines how the [statistical domain size](https://biit.cs.ut.ee/gprofiler/page/docs#statistical_domain_scope) is calculated. This is one of the parameters in the hypergeometric probability function. If `domain_scope = "annotated"` then only the genes with at least one annotation are considered to be part of the full domain. In case if `domain_scope = "known"` then all the genes of the given organism are considered to be part of the domain.
 
 Depending on the research question, in some occasions it is advisable to limit the domain/background set. For example, one may use the custom background when they want to compare a gene list with a custom list of expressed genes. `gost` provides the means to define a custom background as a (mixed) list of gene identifiers with the parameter `custom_bg`. If this parameter is used, then the domain scope is set to `domain_scope = "custom"`. It is also possible to set this parameter to `domain_scope = "custom_annotated"` which will use the set of genes that are annotated in the data source and are also included in the user provided background list. 
 
@@ -300,7 +300,7 @@ Available data sources and their abbreviations are:
 
 ### Custom data sources with `upload_GMT_file`
 
-Instead of available GO, KEGG, etc data sources, users can upload their own custom data source using the Gene Matrix Transposed file format (GMT). The file format is described in [here](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29). The users can compose the files themselves or use pre-compiled gene sets from available dedicated websites like Molecular Signatures Database ([MSigDB](http://software.broadinstitute.org/gsea/msigdb/genesets.jsp)), etc. 
+In addition to the available GO, KEGG, etc data sources, users can upload their own custom data source using the Gene Matrix Transposed file format (GMT). The file format is described in [here](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29). The users can compose the files themselves or use pre-compiled gene sets from available dedicated websites like Molecular Signatures Database ([MSigDB](http://software.broadinstitute.org/gsea/msigdb/genesets.jsp)), etc.
 
 `upload_GMT_file` enables to upload GMT file(s). The input `gmtfile` is the filename of the GMT file together with the path to the file. The input can also be several GMT files compressed into a ZIP file. 
 The file extension should be **.gmt** or **.zip** in case of multiple GMT files. The uploaded filename is used to define the source name in the enrichment results.
@@ -335,19 +335,12 @@ There is no need to repeatedly upload the same GMT file(s) every time before the
 
 `gconvert` enables to map between genes, proteins, microarray probes, common names, various database identifiers, etc, from numerous [databases](https://biit.cs.ut.ee/gprofiler/page/namespaces-list) and for many [species](https://biit.cs.ut.ee/gprofiler/page/organism-list). 
 
-The mapping is achieved via a two-way indexing through Ensembl identifiers:
-
-* input --> gene ID + transcript ID + translation ID
-* database ID + gene ID + transcript ID + translation ID --> input
-
-This may result in duplicate occurrences of the same gene. 
-
 ```{r}
 gconvert(query = c("REAC:R-HSA-3928664", "rs17396340", "NLRP1"), organism = "hsapiens", 
          target="ENSG", mthreshold = Inf, filter_na = TRUE)
 ```
 
-Default `target = ENSG` database is Ensembl ENSG, but `gconvert` also supports other major naming conventions like Uniprot, RefSeq, Entrez, HUGO, HGNC and many more. In addition, a large variety of microarray platforms like Affymetrix, Illumine and Celera are available. 
+Default `target = ENSG` database is Ensembl ENSG, but `gconvert` also supports other major naming conventions like Uniprot, RefSeq, Entrez, HUGO, HGNC and many more. In addition, a large variety of microarray platforms like Affymetrix, Illumina and Celera are available.
 
 The parameter `mthreshold` sets the maximum number of results per initial alias. Shows all results by default. The parameter `filter_na = TRUE` will exclude the results without any corresponding targets.
 
