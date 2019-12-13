@@ -41,8 +41,7 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #'  that this can decrease performance and make the query slower.
 #'  In addition, a column 'intersection' is created that contains the gene id-s that intersect between the query and term.
 #'  This parameter does not work if 'multi_query' is set to TRUE.
-#' @param user_threshold custom p-value threshold, results with a larger p-value are
-#'  excluded.
+#' @param user_threshold custom p-value threshold for significance, results with smaller p-value are tagged as significant. We don't recommend to set it higher than 0.05.
 #' @param correction_method the algorithm used for multiple testing correction, one of "gSCS" (synonyms: "analytical", "g_SCS"), "fdr" (synonyms: "false_discovery_rate"), "bonferroni".
 #' @param domain_scope how to define statistical domain, one of "annotated", "known", "custom" or "custom_annotated".
 #' @param custom_bg vector of gene names to use as a statistical background. If given, the domain_scope is by default set to "custom", if domain_scope is set to "custom_annotated", then this is used instead.
@@ -366,7 +365,7 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
     p_values <- query <- significant <- NULL
     # spread the data frame to correct form
     df$query <- list(names(meta$query_metadata$queries))
-    df <- tidyr::unnest(data = df, p_values, query, significant)
+    df <- tidyr::unnest(data = df, cols = c(p_values, query, significant))
     df <- dplyr::rename(df, p_value = p_values)
   }
 
@@ -615,7 +614,6 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL, width =
 #' @export
 publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE, show_columns = c("source", "term_name", "term_size", "intersection_size"), filename = NULL){
   # gostres is the GOSt response list (contains results and metadata) or a data frame
-
   term_id <- p_values <- query <- p_value <- NULL
 
   if (class(gostres) == "list"){
@@ -657,7 +655,7 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
 
   # default column names to show
   show_columns <- unique(append(show_columns, c("id", "term_id", "p_value")))
-  gp_colnames <- c("id", "source", "term_id", "term_name", "term_size", "query_size", "intersection_size", "p_value")
+  gp_colnames <- c("id", "source", "term_id", "term_name", "term_size", "query_size", "intersection_size", "p_value", "intersection_sizes", "query_sizes")
 
   colnames <- gp_colnames[which(gp_colnames %in% show_columns)]
 
@@ -673,27 +671,37 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
       subdf$query <- list(names(meta$query_metadata$queries))
     } else {
       qnames = paste("query", seq(1, length(subdf$p_values[[1]])), sep = "_")
-      subdf$query <- list(names(qnames))
+      subdf$query <- list(qnames)
+    }
+    spread_col = c("p_values")
+    if ("query_sizes" %in% show_columns){
+      spread_col = append(spread_col, "query_sizes")
+    }
+    if ("intersection_sizes" %in% show_columns){
+      spread_col = append(spread_col, "intersection_sizes")
     }
     # spread the data frame to correct form
-    subdf <- tidyr::unnest(data = subdf, p_values, query)
+    subdf <- tidyr::unnest(data = subdf, cols = c(spread_col, query))
     subdf <- dplyr::rename(subdf, p_value = p_values)
     subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
     showdf <- subdf[,stats::na.omit(match(c(colnames, "query"), names(subdf)))]
-    showdf <- tidyr::spread(showdf, query, p_value)
-    idx <- which(!is.na(match(names(showdf), unique(subdf$query))))
+    #showdf <- subdf[,stats::na.omit(match(c(colnames, "query", spread_col), names(subdf)))]
+    showdf <- tidyr::pivot_wider(showdf, names_from = query, values_from = c(p_value, spread_col[spread_col!="p_values"]))
   } else {
     if ("query" %in% names(subdf) & length(unique(subdf$query)) > 1){
       subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
       showdf <- subdf[,stats::na.omit(match(c(colnames, "query"), names(subdf)))]
-      showdf <- tidyr::spread(showdf, query, p_value)
-      idx <- which(!is.na(match(names(showdf), unique(subdf$query))))
+      spread_col <- c("p_value", "intersection_size", "query_size")
+      spread_col <- intersect(colnames(showdf), spread_col)
+      showdf <- tidyr::pivot_wider(showdf, names_from = query, values_from = spread_col, names_prefix = ifelse(length(spread_col) == 1,"p_value_", ""))
+
     } else {
       subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 3)
       showdf <- subdf[,stats::na.omit(match(colnames, names(subdf)))]
-      idx <- which(!is.na(match(names(showdf), "p_value")))
     }
   }
+  # find the column to color
+  idx <- which(grepl(pattern = "p_value", x = names(showdf)))
 
   # Prepare table
   colours <- matrix("white", nrow(showdf), ncol(showdf))
@@ -1016,7 +1024,8 @@ gconvert = function(
   })
 
   df <- plyr::ldply(df, function(x) data.frame(x, stringsAsFactors = F))
-
+  df <- df[order(df$input_number, df$target_number),]
+  row.names(df) <- NULL
   return(df)
 }
 
@@ -1133,6 +1142,8 @@ gorth <- function(
 
   df <- plyr::ldply(df, function(x) data.frame(x, stringsAsFactors = F))
 
+  df <- df[order(df$input_number, df$ensg_number),]
+  row.names(df) <- NULL
   return(df)
 }
 

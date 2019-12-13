@@ -309,11 +309,11 @@ For example, using the BioCarta gene sets downloaded from the [
 MSigDB Collections] (http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C7)
 
 ```{r eval = F}
-download.file(url = "http://software.broadinstitute.org/gsea/resources/msigdb/7.0/c2.cp.biocarta.v7.0.symbols.gmt", destfile = "data/biocarta.gmt")
+download.file(url = "http://software.broadinstitute.org/gsea/resources/msigdb/7.0/c2.cp.biocarta.v7.0.symbols.gmt", destfile = "extdata/biocarta.gmt")
 ```
 
 ```{r eval = F}
-upload_GMT_file(gmtfile = "../data/biocarta.gmt")
+upload_GMT_file(gmtfile = "extdata/biocarta.gmt")
 ```
 
 The result is a string that denotes the unique ID of the uploaded data source in the [g:Profiler](https://biit.cs.ut.ee/gprofiler) database. In this examaple, the ID is **gp__TEXF_hZLM_d18**.
