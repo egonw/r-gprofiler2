@@ -102,9 +102,12 @@ gost <- function(query,
   }
 
   # Parameters
-
+  correction_methods <- c("g_SCS", "bonferroni", "fdr", "false_discovery_rate", "gSCS", "analytical")
+  if (length(correction_method)>1){
+    correction_method = "g_SCS"
+  }
   ## evaluate choices
-  correction_method <- match.arg(correction_method)
+  correction_method <- match.arg(correction_method, correction_methods)
 
   if (startsWith(organism, "gp__")){
     message("Detected custom GMT source request")
@@ -128,12 +131,16 @@ gost <- function(query,
     }
     t <- ifelse(length(custom_bg) == 1, custom_bg <- jsonlite::unbox(custom_bg), custom_bg <- custom_bg)
   }else{
-    if (domain_scope %in% c("custom_annotated", "custom")){
+    if (all(domain_scope %in% c("custom_annotated", "custom"))){
       stop("Domain scope is set to custom, but no background genes detected from the input.")
     }
   }
+  domain_scopes <- c("annotated", "known", "custom", "custom_annotated")
+  if (length(domain_scope) > 1){
+    domain_scope = "annotated"
+  }
 
-  domain_scope <- match.arg(domain_scope)
+  domain_scope <- match.arg(domain_scope, domain_scopes)
 
   body <- jsonlite::toJSON((
     list(

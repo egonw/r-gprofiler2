@@ -177,7 +177,7 @@ The result `data.frame` will include additional columns:
 
 The function `gost` also allows to perform enrichment on multiple input gene lists. Multiple queries are automatically detected if the input `query` is a `list` of vectors with gene identifiers and the results are combined into identical `data.frame` as in case of single query. 
 
-```{r}
+```{r warning = FALSE}
 multi_gostres1 <- gost(query = list("chromX" = c("X:1000:1000000", "rs17396340", 
                                                  "GO:0005005", "ENSG00000156103", "NLRP1"),
                              "chromY" = c("Y:1:10000000", "rs17396340", 
@@ -193,7 +193,7 @@ The column **query** in the result `data.frame` will now contain the correspondi
 
 Another option for multiple gene lists is setting the parameter `multiquery = TRUE`. Then the results from all of the input queries are grouped according to term IDs for better comparison. 
 
-```{r}
+```{r warning = FALSE}
 multi_gostres2 <- gost(query = list("chromX" = c("X:1000:1000000", "rs17396340",
                                                  "GO:0005005", "ENSG00000156103", "NLRP1"),
                              "chromY" = c("Y:1:10000000", "rs17396340", 
