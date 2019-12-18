@@ -10,7 +10,8 @@ gost(query, organism = "hsapiens", ordered_query = FALSE,
   user_threshold = 0.05, correction_method = c("g_SCS", "bonferroni",
   "fdr", "false_discovery_rate", "gSCS", "analytical"),
   domain_scope = c("annotated", "known", "custom", "custom_annotated"),
-  custom_bg = NULL, numeric_ns = "", sources = NULL)
+  custom_bg = NULL, numeric_ns = "", sources = NULL,
+  as_short_link = FALSE)
 }
 \arguments{
 \item{query}{vector, or a (named) list of vectors for multiple queries, that can consist of mixed types of gene IDs (proteins, transcripts, microarray IDs, etc), SNP IDs, chromosomal intervals or term IDs.}
@@ -51,6 +52,8 @@ This parameter does not work if 'multi_query' is set to TRUE.}
 GO (GO:BP, GO:MF, GO:CC to select a particular GO branch), KEGG, REAC, TF,
 MIRNA, CORUM, HP, HPA, WP. Please see the g:GOSt web tool for the comprehensive
 list and details on incorporated data sources.}
+
+\item{as_short_link}{indicator to return results as short-link to the g:Profiler web tool. If set to TRUE, then the function returns the results URL as a character string instead of the data.frame.}
 }
 \value{
 A named list where 'result' contains data.frame with the enrichment analysis results and 'meta' contains metadata needed for Manhattan plot. If the input
@@ -61,6 +64,8 @@ A named list where 'result' contains data.frame with the enrichment analysis res
  The latter conveys info about the intersecting genes between the corresponding query and term.
 
  The result fields are further described in \url{https://biit.cs.ut.ee/gprofiler_beta/page/apis#gost_query_results}
+
+ If 'as_short_link' is set to TRUE, then the result is a character short-link to see and share corresponding results via the g:Profiler web tool.
 }
 \description{
 Interface to the g:Profiler tool g:GOSt (\url{https://biit.cs.ut.ee/gprofiler/gost}) for functional enrichments analysis of gene lists.

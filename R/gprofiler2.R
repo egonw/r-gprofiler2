@@ -50,6 +50,7 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #'  GO (GO:BP, GO:MF, GO:CC to select a particular GO branch), KEGG, REAC, TF,
 #'  MIRNA, CORUM, HP, HPA, WP. Please see the g:GOSt web tool for the comprehensive
 #'  list and details on incorporated data sources.
+#' @param as_short_link indicator to return results as short-link to the g:Profiler web tool. If set to TRUE, then the function returns the results URL as a character string instead of the data.frame.
 #' @return A named list where 'result' contains data.frame with the enrichment analysis results and 'meta' contains metadata needed for Manhattan plot. If the input
 #'  consisted of several lists the corresponding list is indicated with a variable
 #'  'query'.
@@ -58,6 +59,8 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #'  The latter conveys info about the intersecting genes between the corresponding query and term.
 #'
 #'  The result fields are further described in \url{https://biit.cs.ut.ee/gprofiler_beta/page/apis#gost_query_results}
+#'
+#'  If 'as_short_link' is set to TRUE, then the result is a character short-link to see and share corresponding results via the g:Profiler web tool.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
 #' gostres <- gost(c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"))
@@ -76,7 +79,8 @@ gost <- function(query,
                       domain_scope = c("annotated", "known", "custom", "custom_annotated"),
                       custom_bg = NULL,
                       numeric_ns  = "",
-                      sources = NULL
+                      sources = NULL,
+                      as_short_link = FALSE
                     ) {
 
   url = paste0(file.path(gp_globals$base_url, "api", "gost", "profile"), "/")
@@ -101,13 +105,10 @@ gost <- function(query,
     query = query[!is.na(query)]
   }
 
-  # Parameters
-  correction_methods <- c("g_SCS", "bonferroni", "fdr", "false_discovery_rate", "gSCS", "analytical")
-  if (length(correction_method)>1){
-    correction_method = "g_SCS"
-  }
   ## evaluate choices
-  correction_method <- match.arg(correction_method, correction_methods)
+  correction_method <- match.arg(correction_method)
+  domain_scope <- match.arg(domain_scope)
+
 
   if (startsWith(organism, "gp__")){
     message("Detected custom GMT source request")
@@ -131,40 +132,73 @@ gost <- function(query,
     }
     t <- ifelse(length(custom_bg) == 1, custom_bg <- jsonlite::unbox(custom_bg), custom_bg <- custom_bg)
   }else{
-    if (all(domain_scope %in% c("custom_annotated", "custom"))){
+    if (domain_scope %in% c("custom_annotated", "custom")){
       stop("Domain scope is set to custom, but no background genes detected from the input.")
     }
   }
-  domain_scopes <- c("annotated", "known", "custom", "custom_annotated")
-  if (length(domain_scope) > 1){
-    domain_scope = "annotated"
+
+  if (as_short_link){
+    # query should be a string in this case
+
+    if(!is.null(names(query))){
+      query2 = paste0(unlist(lapply(names(query), function(x) paste(">", x, "\n", paste0(query[[x]], collapse = " ")))), collapse = "\n")
+      multi_query = TRUE
+    }else{
+      query2 = paste0(query, collapse = " ")
+    }
+
+    url = file.path("http://biit.cs.ut.ee", "gplink", "l")
+
+    body <- jsonlite::toJSON((
+      list(
+        url = jsonlite::unbox(file.path(gprofiler2::get_base_url(), "gost")),
+        payload = {
+          list(
+            organism = jsonlite::unbox(organism),
+            query = jsonlite::unbox(query2),
+            sources = sources,
+            user_threshold = jsonlite::unbox(user_threshold),
+            all_results = jsonlite::unbox(!significant),
+            ordered = jsonlite::unbox(ordered_query),
+            no_evidences = jsonlite::unbox(!evcodes),
+            combined = jsonlite::unbox(multi_query),
+            measure_underrepresentation = jsonlite::unbox(measure_underrepresentation),
+            no_iea = jsonlite::unbox(exclude_iea),
+            domain_scope = jsonlite::unbox(domain_scope),
+            numeric_ns = jsonlite::unbox(numeric_ns),
+            significance_threshold_method = jsonlite::unbox(correction_method),
+            background = custom_bg)
+        }
+      )
+    ),
+    auto_unbox = FALSE,
+    null = "null")
+
+  } else {
+    body <- jsonlite::toJSON((
+      list(
+        organism = jsonlite::unbox(organism),
+        query = query,
+        sources = sources,
+        user_threshold = jsonlite::unbox(user_threshold),
+        all_results = jsonlite::unbox(!significant),
+        ordered = jsonlite::unbox(ordered_query),
+        no_evidences = jsonlite::unbox(!evcodes),
+        combined = jsonlite::unbox(multi_query),
+        measure_underrepresentation = jsonlite::unbox(measure_underrepresentation),
+        no_iea = jsonlite::unbox(exclude_iea),
+        domain_scope = jsonlite::unbox(domain_scope),
+        numeric_ns = jsonlite::unbox(numeric_ns),
+        significance_threshold_method = jsonlite::unbox(correction_method),
+        background = custom_bg,
+        output = jsonlite::unbox("json")
+      )
+    ),
+    auto_unbox = FALSE,
+    null = "null")
   }
 
-  domain_scope <- match.arg(domain_scope, domain_scopes)
-
-  body <- jsonlite::toJSON((
-    list(
-      organism = jsonlite::unbox(organism),
-      query = query,
-      sources = sources,
-      user_threshold = jsonlite::unbox(user_threshold),
-      all_results = jsonlite::unbox(!significant),
-      ordered = jsonlite::unbox(ordered_query),
-      no_evidences = jsonlite::unbox(!evcodes),
-      combined = jsonlite::unbox(multi_query),
-      measure_underrepresentation = jsonlite::unbox(measure_underrepresentation),
-      no_iea = jsonlite::unbox(exclude_iea),
-      domain_scope = jsonlite::unbox(domain_scope),
-      numeric_ns = jsonlite::unbox(numeric_ns),
-      significance_threshold_method = jsonlite::unbox(correction_method),
-      background = custom_bg,
-      output = jsonlite::unbox("json")
-    )
-  ),
-  auto_unbox = FALSE,
-  null = "null")
   # Headers
-
   headers <-
     list("Accept" = "application/json",
          "Content-Type" = "application/json",
@@ -196,6 +230,12 @@ gost <- function(query,
   }
 
   res <- jsonlite::fromJSON(txt)
+
+  if (as_short_link){
+    shortlink = paste0('https://biit.cs.ut.ee/gplink/l/', res$result)
+    return(shortlink)
+  }
+
   df = res$result
   meta = res$meta
 
