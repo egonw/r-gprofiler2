@@ -1,11 +1,9 @@
 ---
 title: "Gene list functional enrichment analysis and namespace conversion with gprofiler2"
-#author: "Liis Kolberg, Uku Raudvere"
 #rmarkdown::html_vignette
-output:
+output: 
   prettydoc::html_pretty:
     theme: cayman
-    #theme: architect
     highlight: github
     toc: true
 vignette: >
@@ -39,7 +37,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) provides an R interface to the widely used web toolset g:Profiler ([https://biit.cs.ut.ee/gprofiler](https://biit.cs.ut.ee/gprofiler)). 
+[gprofiler2](https://CRAN.R-project.org/package=gprofiler2) provides an R interface to the widely used web toolset g:Profiler ([https://biit.cs.ut.ee/gprofiler](https://biit.cs.ut.ee/gprofiler)). 
 
 The toolset performs functional enrichment analysis and visualization of gene lists, converts gene/protein/SNP identifiers to numerous namespaces, and maps orthologous genes across species. 
 [g:Profiler](https://biit.cs.ut.ee/gprofiler) relies on [Ensembl databases](https://www.ensembl.org/index.html) as the primary data source and follows their release cycle for updates.
@@ -54,16 +52,16 @@ The input for any of the tools can consist of mixed types of gene identifiers, S
 
 * [g:SNPense](https://biit.cs.ut.ee/gprofiler/snpense) - mapping SNP rs-identifiers to chromosome positions, protein coding genes and variant effects 
 
-Corresponding functions in the [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) R package are:
+Corresponding functions in the [gprofiler2](https://CRAN.R-project.org/package=gprofiler2) R package are:
 
 * [`gost`][Gene list functional enrichment analysis with `gost`]
 * [`gconvert`][Gene identifier conversion with `gconvert`]
 * [`gorth`][Mapping homologous genes across related organisms with `gorth`]
 * [`gsnpense`][SNP identifier conversion to gene name with `gsnpense`]
 
-[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) uses the [publicly available APIs](https://biit.cs.ut.ee/gprofiler/page/apis) of the g:Profiler web tool which ensures that the results from all of the interfaces are consistent.
+[gprofiler2](https://CRAN.R-project.org/package=gprofiler2) uses the [publicly available APIs](https://biit.cs.ut.ee/gprofiler/page/apis) of the g:Profiler web tool which ensures that the results from all of the interfaces are consistent.
 
-The package corresponds to the 2019 update of [g:Profiler](https://biit.cs.ut.ee/gprofiler) and provides access for versions *e94_eg41_p11* and higher. The older versions are available from the previous R package [gProfileR](https://cran.r-project.org/web/packages/gProfileR/index.html).
+The package corresponds to the 2019 update of [g:Profiler](https://biit.cs.ut.ee/gprofiler) and provides access for versions *e94_eg41_p11* and higher. The older versions are available from the previous R package [gProfileR](https://CRAN.R-project.org/package=gProfileR).
 
 ----
 

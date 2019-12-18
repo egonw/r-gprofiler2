@@ -20,5 +20,6 @@ Imports: jsonlite, RCurl, ggplot2, plotly, tidyr, crosstalk, plyr, grDevices, gr
 Depends: R (>= 3.5)
 Suggests: 
     knitr,
-    rmarkdown
-VignetteBuilder: knitr
+    rmarkdown,
+    prettydoc
+VignetteBuilder: knitr, rmarkdown
