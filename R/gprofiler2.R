@@ -1,6 +1,10 @@
 gp_globals = new.env()
 
-gp_globals$version = "mitigate417"
+gp_globals$version =
+  tryCatch(
+    utils::packageVersion("gprofiler2"),
+    error = function(e) { return("unknown_version") }
+  );
 
 # Set SSL version to TLSv1_2 with fallback to TLSv1_1
 # CURL_SSLVERSION_SSLv3 is not used due to the SSLv3 vulnerability <https://access.redhat.com/articles/1232123>
