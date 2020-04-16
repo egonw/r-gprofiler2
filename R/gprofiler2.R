@@ -87,7 +87,7 @@ gost <- function(query,
 
   # Query
 
-  if (is.null(query)) {
+  if (is.null(query) | is.na(query)) {
     stop("Missing query")
   } else if (is.list(query)) {
     if (is.data.frame(query)){
@@ -100,6 +100,8 @@ gost <- function(query,
       names(query) = qnames
     }
     query = lapply(query, function(x) x[!is.na(x)])
+    # remove NA/NULL elements from list
+
   }
   else{
     query = query[!is.na(query)]
@@ -1281,6 +1283,10 @@ gsnpense <- function(
     df <- df[!is.na(df$chromosome),]
   }
   row.names(df) <- NULL
+  # spread the data frame to longer form
+  df <- tidyr::unchop(df, c("ensgs", "gene_names"))
+  # unnest variants column
+  df <- do.call(data.frame, df)
   return(df)
 }
 
