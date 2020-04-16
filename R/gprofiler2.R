@@ -204,9 +204,9 @@ gost <- function(query,
   headers <-
     list("Accept" = "application/json",
          "Content-Type" = "application/json",
-         "charset" = "UTF-8")
-
-  oldw <- getOption("warn")
+         "charset" = "UTF-8",
+          "Expect" = "")
+oldw <- getOption("warn")
   options(warn = -1)
   h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
   h2 = RCurl::getCurlHandle() # Get info about the request
@@ -852,9 +852,9 @@ upload_GMT_file <- function(gmtfile){
     headers <-
       list("Accept" = "application/json",
            "Content-Type" = "application/json",
-           "charset" = "UTF-8")
-
-    oldw <- getOption("warn")
+           "charset" = "UTF-8",
+           "Expect" = "")
+oldw <- getOption("warn")
     options(warn = -1)
     h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
     h2 = RCurl::getCurlHandle() # Get info about the request
@@ -932,9 +932,9 @@ random_query <- function(organism = "hsapiens"){
 
   headers <- list("Accept" = "application/json",
                   "Content-Type" = "application/json",
-                  "charset" = "UTF-8")
-
-  oldw <- getOption("warn")
+                  "charset" = "UTF-8",
+                  "Expect" = "")
+oldw <- getOption("warn")
   options(warn = -1)
   h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
   h2 = RCurl::getCurlHandle() # Get info about the request
@@ -1019,7 +1019,9 @@ gconvert = function(
   headers <-
     list("Accept" = "application/json",
          "Content-Type" = "application/json",
-         "charset" = "UTF-8")
+         "charset" = "UTF-8",
+         "Expect" = "")
+
 
   oldw <- getOption("warn")
   options(warn = -1)
@@ -1136,7 +1138,9 @@ gorth <- function(
   headers <-
     list("Accept" = "application/json",
          "Content-Type" = "application/json",
-         "charset" = "UTF-8")
+         "charset" = "UTF-8",
+         "Expect" = "")
+
 
   oldw <- getOption("warn")
   options(warn = -1)
@@ -1235,11 +1239,12 @@ gsnpense <- function(
   null = "null")
 
   # Headers
-
   headers <-
     list("Accept" = "application/json",
          "Content-Type" = "application/json",
-         "charset" = "UTF-8")
+         "charset" = "UTF-8",
+         "Expect" = "")
+
 
   oldw <- getOption("warn")
   options(warn = -1)
