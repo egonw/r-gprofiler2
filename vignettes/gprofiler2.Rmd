@@ -346,7 +346,7 @@ For example, the same query in the web tool is available from [https://biit.cs.u
 
 ## Creating a Generic Enrichment Map (GEM) file for EnrichmentMap 
 
-Generic Enrichment Map (GEM) is a file format that can be used as an input for [Cytoscape EnrichmentMap application](http://apps.cytoscape.org/apps/enrichmentmap). In EnrichmentMap you can set the Analysis Type parameter as **Generic/gProfiler** and upload the required files: GEM file with enrichment results and GMT file that defines the annotations. 
+Generic Enrichment Map (GEM) is a file format that can be used as an input for [Cytoscape EnrichmentMap application](http://apps.cytoscape.org/apps/enrichmentmap). In EnrichmentMap you can set the Analysis Type parameter as **Generic/gProfiler** and upload the required files: GEM file with enrichment results (input field **Enrichments**) and GMT file that defines the annotations (input field **GMT**). 
 
 For a single query, the GEM file can be generated and saved using the following commands:
 
@@ -360,16 +360,15 @@ colnames(gem) <- c("GO.ID", "Description", "p.Val", "Genes")
 gem$FDR <- gem$p.Val
 gem$Phenotype = "+1"
 gem <- gem[,c("GO.ID", "Description", "p.Val", "FDR", "Phenotype", "Genes")]
-gem <- gem[order(gem$p.Val),]
 head(gem)
 ```
 
-The parameter `evcodes = TRUE` is necessary as it returns the column **intersection** with corresponding gene IDs that are annotated to the term. 
+Here you can replace the `query` parameter with your own input. The parameter `evcodes = TRUE` is necessary as it returns the column **intersection** with corresponding gene IDs that are annotated to the term. 
 
 Saving the file before uploading to Cytoscape:
 
 ```{r, eval=F}
-write.table(gem, file = "extdata/gProfiler.gem.txt", sep = "\t", quote = F, row.names = F)
+write.table(gem, file = "extdata/gProfiler_gem.txt", sep = "\t", quote = F, row.names = F)
 ```
 
 Here the parameter `file` should be the character string naming the file together with the path you want to save it to. 
@@ -380,7 +379,7 @@ For other organisms, the GMT files are downloadable from the [g:Profiler web pag
 
 In case you want to compare **multiple queries** in EnrichmentMap you could generate individual GEM files for each of the queries and upload these as separate Data sets. This EnrichmentMap option enables you to browse, edit and compare multiple networks simultaneously by color-coding different uploaded Data sets.  
 
-These files can be generated with the following commands (note that the parameter is still set to `multi_query = FALSE`):
+For example, these files can be generated with the following commands (note that the parameter is still set to `multi_query = FALSE`):
 
 ```{r, eval=F}
 # enrichment for two input gene lists
@@ -398,14 +397,15 @@ gem$FDR <- gem$p.Val
 gem$Phenotype = "+1"
 
 # write separate files for queries
+
+# install.packages("dplyr")
 library(dplyr)
 
 gem %>% group_by(query) %>%
   group_walk(~
     write.table(data.frame(.x[,c("GO.ID", "Description", "p.Val", "FDR", "Phenotype", "Genes")]), 
-                file = file.path("extdata", paste0("gProfiler_", unique(.y$query), ".gem.txt")),
-                sep = "\t", quote = F, row.names = F)
-  )
+                file = paste0("gProfiler_", unique(.y$query), "_gem.txt"),
+                sep = "\t", quote = F, row.names = F))
 ```
 
 ----
