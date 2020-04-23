@@ -33,7 +33,7 @@ corresponding target.}
 The output is a data.frame which is a table closely corresponding to the
 web interface output.
 
-The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 }
 \description{
 Interface to the g:Profiler tool g:Convert (\url{https://biit.cs.ut.ee/gprofiler/convert}) that uses the information in Ensembl databases to handle hundreds of types of identifiers for genes, proteins, transcripts, microarray probesets, etc, for many species,

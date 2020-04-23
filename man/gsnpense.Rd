@@ -16,7 +16,7 @@ corresponding target name.}
 The output is a data.frame which is a table closely corresponding to the
 web interface output. Columns 'ensgs' and 'gene_names' can contain list of multiple values.
 
-The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 }
 \description{
 Interface to the g:Profiler tool g:SNPense (\url{https://biit.cs.ut.ee/gprofiler/snpense}) that maps SNP rs identifiers to chromosome positions, genes and variant effects.

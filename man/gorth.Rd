@@ -35,7 +35,7 @@ corresponding target name.}
 The output is a data.frame which is a table closely corresponding to the
 web interface output.
 
-The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 }
 \description{
 Interface to the g:Profiler tool g:Orth (\url{https://biit.cs.ut.ee/gprofiler/orth}) that, given a target organism, retrieves the genes of the target organism that are similar in sequence to the source organism genes in the input.

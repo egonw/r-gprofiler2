@@ -62,7 +62,7 @@ gp_globals$base_url = "http://biit.cs.ut.ee/gprofiler"
 #'  If 'evcodes' is set, the return value includes columns 'evidence_codes' and 'intersection'.
 #'  The latter conveys info about the intersecting genes between the corresponding query and term.
 #'
-#'  The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+#'  The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 #'
 #'  If 'as_short_link' is set to TRUE, then the result is a character short-link to see and share corresponding results via the g:Profiler web tool.
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
@@ -990,7 +990,7 @@ oldw <- getOption("warn")
 #' @return The output is a data.frame which is a table closely corresponding to the
 #' web interface output.
 #'
-#' The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+#' The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 #'
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
@@ -1125,7 +1125,7 @@ gconvert = function(
 #' @return The output is a data.frame which is a table closely corresponding to the
 #' web interface output.
 #'
-#' The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+#' The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 #'
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples
@@ -1255,7 +1255,7 @@ gorth <- function(
 #' @return The output is a data.frame which is a table closely corresponding to the
 #' web interface output. Columns 'ensgs' and 'gene_names' can contain list of multiple values.
 #'
-#' The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+#' The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 #'
 #' @author  Liis Kolberg <liis.kolberg@@ut.ee>, Uku Raudvere <uku.raudvere@@ut.ee>
 #' @examples

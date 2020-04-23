@@ -73,7 +73,7 @@ A named list where 'result' contains data.frame with the enrichment analysis res
  If 'evcodes' is set, the return value includes columns 'evidence_codes' and 'intersection'.
  The latter conveys info about the intersecting genes between the corresponding query and term.
 
- The result fields are further described in the \href{https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html}{vignette}.
+ The result fields are further described in the \href{https://cran.r-project.org/package=gprofiler2/vignettes/gprofiler2.html}{vignette}.
 
  If 'as_short_link' is set to TRUE, then the result is a character short-link to see and share corresponding results via the g:Profiler web tool.
 }
