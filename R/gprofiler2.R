@@ -493,7 +493,9 @@ gostplot <- function(gostres, capped = TRUE, interactive = TRUE, pal = c("GO:MF"
     ggplot2::scale_y_continuous(expand = c(0, 0), limits = c(ymin, ymax),
                                 labels = ticklabels,
                                 breaks = tickvals) +
-    ggplot2::scale_x_continuous(expand = c(0, 0), limits = c(0, 210), breaks = (xScale(starts) + xScale(starts + widthscale))/2, labels = names(widthscale))
+    ggplot2::scale_x_continuous(expand = c(0, 0), limits = c(0, 210),
+                                breaks = (xScale(starts) + xScale(starts + widthscale))/2,
+                                labels = names(widthscale))
 
   for (s in names(widthscale)){
     xstart = xScale(starts[s])
@@ -683,6 +685,9 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
 
   subdf$id <- match(subdf$term_id, highlight_terms)
 
+  # order by id column
+  subdf = subdf[order(subdf$id),]
+
   # default column names to show
   show_columns <- unique(append(show_columns, c("id", "term_id", "p_value")))
   gp_colnames <- c("id", "source", "term_id", "term_name", "term_size", "query_size", "intersection_size", "p_value", "intersection_sizes", "query_sizes")
@@ -846,7 +851,16 @@ upload_GMT_file <- function(gmtfile){
   if (endsWith(gmtfile, ".gmt")){
     # GMT file
     gmturl = paste0(file.path(gp_globals$base_url, "api", "gost", "custom"), "/")
-    gmtdata <- paste(readLines(gmtfile, skipNul = TRUE), collapse = "\n")
+    # read in file and remove duplicated rows
+    gmtlist = unique(readLines(gmtfile, skipNul = TRUE))
+    # check for duplicated term_ids
+    term_ids = unlist(lapply(gmtlist, function(x) strsplit(x, "\t")[[1]][1]))
+    if (sum(duplicated(term_ids)) > 0){
+      duplicates = paste(term_ids[duplicated(term_ids)], collapse = ", ")
+      stop("Your GMT file includes duplicated identifiers: ", duplicates, ".\nPlease remove duplicated identifiers and try to upload again.")
+    }
+
+    gmtdata <- paste(gmtlist, collapse = "\n")
 
     body <- jsonlite::toJSON((
       list(
@@ -863,7 +877,7 @@ upload_GMT_file <- function(gmtfile){
            "Content-Type" = "application/json",
            "charset" = "UTF-8",
            "Expect" = "")
-oldw <- getOption("warn")
+    oldw <- getOption("warn")
     options(warn = -1)
     h1 = RCurl::basicTextGatherer(.mapUnicode = FALSE)
     h2 = RCurl::getCurlHandle() # Get info about the request
