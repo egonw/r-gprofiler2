@@ -581,6 +581,7 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL, width =
       return(p)
     }
 
+    highlight_terms <- unique(highlight_terms)
     subdf$id <- match(subdf$term_id, highlight_terms)
 
     p <- p + ggplot2::geom_point(data = subdf, ggplot2::aes(x = order, y = logpval, size = term_size_scaled), pch=21, colour = "black")
@@ -588,7 +589,9 @@ publish_gostplot <- function(p, highlight_terms = NULL, filename = NULL, width =
       ggplot2::geom_text(data = subdf, size = 4, colour = "black", fontface = "bold", ggplot2::aes(label = as.character(id)), hjust = -1.2, vjust = -0.05)
 
     # add table
-    tb <- publish_gosttable(data.frame(subdf), highlight_terms = highlight_terms, use_colors = TRUE, show_columns = c("source", "term_name", "term_size"), filename = NULL, ggplot = FALSE)
+    pseudo_gostres <- list("result" = data.frame(subdf), "meta" = list("query_metadata"= list("queries" = sapply(unique(subdf$query), function(x) NULL))))
+    #tb <- publish_gosttable(data.frame(subdf), highlight_terms = highlight_terms, use_colors = TRUE, show_columns = c("source", "term_name", "term_size"), filename = NULL, ggplot = FALSE)
+    tb <- publish_gosttable(pseudo_gostres, highlight_terms = highlight_terms, use_colors = TRUE, show_columns = c("source", "term_name", "term_size"), filename = NULL, ggplot = FALSE)
 
     h <- grid::unit.c(grid::unit(1, "null"), sum(tb$heights) + grid::unit(3, "mm"))
     w <- grid::unit.c(grid::unit(1, "null"))
@@ -683,6 +686,7 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
     stop("None of the term IDs in the 'highlight_terms' were found from the results.")
   }
 
+  highlight_terms <- unique(highlight_terms)
   subdf$id <- match(subdf$term_id, highlight_terms)
 
   # order by id column
@@ -730,6 +734,18 @@ publish_gosttable <- function(gostres, highlight_terms = NULL, use_colors = TRUE
       spread_col <- intersect(colnames(showdf), spread_col)
       spread_col <- intersect(show_columns, spread_col)
       showdf <- tidyr::pivot_wider(showdf, names_from = query, values_from = spread_col, names_prefix = ifelse(length(spread_col) == 1,"p_value ", ""))
+      # order columns by query
+      if ('meta' %in% names(gostres)){
+        input_order <- names(gostres$meta$query_metadata$queries)
+        if (length(spread_col) == 1){
+          input_order <- paste("p_value", input_order)
+        } else{
+          input_order <- unlist(lapply(spread_col, function(x) paste(x, input_order, sep = "_")))
+        }
+
+        showdf <- showdf[c(names(showdf)[stats::na.omit(match(colnames, names(showdf)))], input_order) ]
+
+      }
 
     } else {
       subdf$p_value <- formatC(subdf$p_value, format = "e", digits = 1)
