@@ -103,8 +103,10 @@ gost <- function(query,
       qnames = paste("query", seq(1, length(query)), sep = "_")
       names(query) = qnames
     }
-    query = lapply(query, function(x) x[!is.na(x)])
     # remove NA/NULL elements from list
+    query = lapply(query, function(x) x[!is.na(x)])
+    # remove empty queries from list
+    query = query[lapply(query, length) > 0]
   }
   else{
     query = query[!is.na(query)]
