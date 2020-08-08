@@ -9,7 +9,7 @@ Description: A toolset for functional enrichment analysis and visualization, gen
     (1) 'g:GOSt' - functional enrichment analysis and visualization of gene lists; 
     (2) 'g:Convert' - gene/protein/transcript identifier conversion across various namespaces;
     (3) 'g:Orth' - orthology search across species;
-    (4) 'g:SNPense' - mapping SNP rs identifiers to chromosome positions, genes and variant effects
+    (4) 'g:SNPense' - mapping SNP rs identifiers to chromosome positions, genes and variant effects.
     This package is an R interface corresponding to the 2019 update of 'g:Profiler' and provides access to 'g:Profiler' for versions 'e94_eg41_p11' and higher. See the package 'gProfileR' for accessing older versions from the 'g:Profiler' toolset.  
 BugReports: https://biit.cs.ut.ee/gprofiler/page/contact
 License: GPL (>= 2)
